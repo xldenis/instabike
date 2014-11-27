@@ -40,10 +40,14 @@ with open('/Users/samijaber/Downloads/CrashStat3_Ped-Bike-Crashes_1995-2009_2011
 end = datetime(2009, 12, 31)
 e = convDate(end)
 all_days = range(1, e)
+
+# add missing days
 for day in all_days:
 	if not day in crsh_by_day:
 		crsh_by_day[day] = [0, 0, 0, 0, 0]
 
+
+# sort by day
 srtd = sorted(crsh_by_day.items(), key=operator.itemgetter(0))
 fnl = [s[1] for s in srtd]
 
@@ -61,24 +65,14 @@ y_test = test_set[1:]
 ####################################################################################
 ####################################################################################
 
-from __future__ import print_function
-
-import datetime
 import numpy as np
-import pylab as pl
-from matplotlib.finance import quotes_historical_yahoo
-from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 from hmmlearn.hmm import GaussianHMM
 
+new_x = np.zeros((5, 4929, 1))
+
+for idx, x in enumerate(x_train):
+	for seq in range(0, 5):
+		new_x[seq][idx] = [x[seq]]
+
 model = GaussianHMM(7)
-
-ntrain = np.array(x_train)
-
-
-
-
-model.fit(tpl1)
-
-
-ntest = np.array(tpl2)
-hidden_states = model.predict(ntest)
+model.fit(new_x)
