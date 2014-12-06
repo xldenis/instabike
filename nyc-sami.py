@@ -1,4 +1,5 @@
 import csv
+import operator
 from datetime import datetime
 from sklearn import cross_validation
 
@@ -68,11 +69,59 @@ y_test = test_set[1:]
 import numpy as np
 from hmmlearn.hmm import GaussianHMM
 
-new_x = np.zeros((5, 4929, 1))
+new_x = np.asarray(x_train)
 
-for idx, x in enumerate(x_train):
-	for seq in range(0, 5):
-		new_x[seq][idx] = [x[seq]]
+n_comps = 6
+model = GaussianHMM(n_comps)
+model.fit([new_x])
+hidden_states = model.predict(new_x)
 
-model = GaussianHMM(7)
-model.fit(new_x)
+
+###############################################################################
+# print trained parameters and plot
+
+import pylab as pl
+from matplotlib.finance import quotes_historical_yahoo
+from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
+
+print("Transition matrix")
+print(model.transmat_)
+print()
+
+print("means and vars of each hidden state")
+for i in range(n_comps):
+    print("%dth hidden state" % i)
+    print("mean = ", model.means_[i])
+    print("var = ", np.diag(model.covars_[i]))
+    print()
+
+years = YearLocator()   # every year
+months = MonthLocator()  # every month
+yearsFmt = DateFormatter('%Y')
+fig = pl.figure()
+ax = fig.add_subplot(111)
+
+ald = np.asarray(all_days)
+summed_fnl = [sum(x) for x in fnl]
+smdf = np.asarray(summed_fnl)
+
+for i in range(n_comps):
+    # use fancy indexing to plot data in each state
+    idx = (hidden_states == i)
+	# print(idx, all_days[idx], summed_fnl[idx], sep=',')
+    ax.plot_date(ald[idx], smdf[idx], 'o', label="%dth hidden state" % i)
+ax.legend()
+
+# format the ticks
+ax.xaxis.set_major_locator(years)
+ax.xaxis.set_major_formatter(yearsFmt)
+ax.xaxis.set_minor_locator(months)
+ax.autoscale_view()
+
+# format the coords message box
+ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+ax.fmt_ydata = lambda x: '$%1.2f' % x
+ax.grid(True)
+
+fig.autofmt_xdate()
+pl.show()
