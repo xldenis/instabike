@@ -11,14 +11,14 @@ def convDate(date):
 	return t - s
 
 # find all accidents involving a bycicle 
-with open('/Users/samijaber/Downloads/CrashStat3_Ped-Bike-Crashes_1995-2009_20111020.csv/TBL_VEHICLE_1995_2009_20111020.csv', 'rb') as csvfile1:
+with open('crashstatdata/TBL_VEHICLE_1995_2009_20111020.csv', 'rb') as csvfile1:
 	rdr1 = csv.reader(csvfile1)
 	bike_crsh = []
 	for row in rdr1:
 		if row[5] == "35":
 			bike_crsh += [row[1]]
 
-with open('/Users/samijaber/Downloads/CrashStat3_Ped-Bike-Crashes_1995-2009_20111020.csv/TBL_CRASHES_1995_2009_20111020.csv', 'rb') as csvfile2:
+with open('crashstatdata/TBL_CRASHES_1995_2009_20111020.csv', 'rb') as csvfile2:
 	rdr2 = csv.reader(csvfile2)
 
 	# BRONX, KINGS, NEW YORK, QUEENS, RICHMOND
