@@ -7,19 +7,23 @@ import pickle
 start = datetime(1995, 1, 1)
 s = int(start.strftime("%s")) / 86400
 
+vehicle_data_file = "../../data/crashstatdata/TBL_VEHICLE_1995_2009_20111020.csv"
+crash_data_file = "../../data/crashstatdata/TBL_CRASHES_1995_2009_20111020.csv"
+borough_list = {'Brooklyn': 0, 'Manhattan': 1, 'Queens': 2, 'Staten Island': 3, 'The Bronx': 4}
+
 def convDate(date):
 	t = int(date.strftime("%s")) / 86400
 	return t - s
 
-# find all accidents involving a bycicle 
-with open('/Users/samijaber/Downloads/CrashStat3_Ped-Bike-Crashes_1995-2009_20111020.csv/TBL_VEHICLE_1995_2009_20111020.csv', 'rb') as csvfile1:
+# find all accidents involving a bycicle
+with open(vehicle_data_file, 'rb') as csvfile1:
 	rdr1 = csv.reader(csvfile1)
-	bike_crsh = []
+	bike_crsh = set()
 	for row in rdr1:
 		if row[5] == "35":
-			bike_crsh += [row[1]]
+			bike_crsh.add(row[1])
 
-with open('/Users/samijaber/Downloads/CrashStat3_Ped-Bike-Crashes_1995-2009_20111020.csv/TBL_CRASHES_1995_2009_20111020.csv', 'rb') as csvfile2:
+with open(crash_data_file, 'rb') as csvfile2:
 	rdr2 = csv.reader(csvfile2)
 
 	# BRONX, KINGS, NEW YORK, QUEENS, RICHMOND
@@ -33,9 +37,10 @@ with open('/Users/samijaber/Downloads/CrashStat3_Ped-Bike-Crashes_1995-2009_2011
 
 			if not day_num in crsh_by_day:
 				crsh_by_day[day_num] = [0, 0, 0, 0, 0]
-
 			x = crsh_by_day[day_num]
-			idx = int(row[25][1]) - 1
+			if row[45] == "None":
+				continue
+			idx = borough_list[row[45]]
 			x[idx] += 1
 
 # last day
@@ -55,3 +60,6 @@ fnl = [s[1] for s in srtd]
 
 train_set = fnl[:4930]
 test_set = fnl[4930:]
+
+with open("fnl.pk", "wb") as f:
+	pickle.dump(fnl, f)
