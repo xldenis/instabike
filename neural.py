@@ -7,14 +7,16 @@ from collections import deque
 from pandas.stats.moments import rolling_mean
 
 from nyc import *
+from avr import avr_p
 
 import matplotlib.pyplot as plt
 
 frame = pandas.DataFrame(fnl)
-frame = (frame - frame.mean()) / (frame.max() - frame.min())
+# frame = (frame - frame.mean()) / (frame.max() - frame.min())
+frame = (frame - frame.mean()) / (frame.var())
 k = 30
 
-for i in [0,1,2]:
+for i in frame.columns:
 
   fnn = FeedForwardNetwork()
   inLayer = LinearLayer(k)
@@ -47,7 +49,7 @@ for i in [0,1,2]:
 
   # trainer.trainEpochs(15)
 
-  trainer.trainUntilConvergence(maxEpochs=5)
+  trainer.trainUntilConvergence(maxEpochs=10)
 
   res = fnn.activateOnDataset(testDS)
 
@@ -56,5 +58,6 @@ for i in [0,1,2]:
   plt.figure()
   ax = rolling_mean(test,30).plot()
   rolling_mean(res,30).plot(ax=ax, style='r--')
+  print 'AVR SCORE %f' %(avr_p(test[k+1:],res))
 ax = rolling_mean(frame.iloc[5000:],30).plot()  
 plt.show()

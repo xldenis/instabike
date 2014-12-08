@@ -11,3 +11,11 @@ def avr(true_y, predicted_y):
     denom_sq = denom ** 2
 
     return diff_sq.sum() / denom_sq.sum()
+
+def avr_p(true,pred):
+  diff = true.rsub(pred.squeeze(),axis=0)
+  diff_sq = diff ** 2
+  denom = true - true.mean()
+  denom_sq = denom ** 2
+
+  return diff_sq.sum() / denom_sq.sum()
